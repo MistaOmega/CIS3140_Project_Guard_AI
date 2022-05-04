@@ -46,6 +46,7 @@ public class FOV : MonoBehaviour
             if (visibleTargets.Count > 0 && _GuardStateMan.GetCurrentState().GetType() != typeof(GuardAttackState))
             {
                 guardStateTimer = 0;
+                _GuardStateMan.SetDroppingStaleness(false);
                 _GuardStateMan.ChangeState(_GuardStateMan._guardAttackState);
             }
             else if (!visibleTargets.Any() &&

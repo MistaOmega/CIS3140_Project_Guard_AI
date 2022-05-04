@@ -15,23 +15,22 @@ namespace AI
     /// </summary>
     public class GuardStateMan : MonoBehaviour
     {
-        private int _guardNavX;
-        private int _guardNavZ;
-        
         public NavMeshAgent
             agent; // this will get managed by the states, but as one is only in use at a time, there should be no problems with this approach. I hope.
 
         public FOV _FOV;
         public float initialAgentSpeed = 3.5f;
-
         public bool isSlave;
         public bool onDamaging;
         public GridVisualiser _gridVisualiser;
         private GuardBaseState _currentState; // Holds reference to whatever state the guard is currently in
+        private bool _droppingStaleness;
         public GuardAttackState _guardAttackState = new GuardAttackState();
+        private int _guardNavX;
+        private int _guardNavZ;
         public GuardPatrolState _guardPatrolState = new GuardPatrolState();
-        public GuardSearchState _guardSearchState = new GuardSearchState();
         public GuardPatrolStateWithStaleness _GuardPatrolStateWithStaleness = new GuardPatrolStateWithStaleness();
+        public GuardSearchState _guardSearchState = new GuardSearchState();
 
         /// <summary>
         ///     Start function runs at the start of the game state, inherited from MonoBehaviour
@@ -52,7 +51,6 @@ namespace AI
         private void Update()
         {
             _currentState.UpdateState(this);
-            //Debug.Log(_currentState);
         }
 
         public void GetGuardAssignedGridPosition(out int x, out int z)
@@ -72,15 +70,7 @@ namespace AI
             _guardNavX = 99; // this isn't in grid space so we can ignore
             _guardNavZ = 99;
         }
-
-        private IEnumerator DropStalenessAtCell()
-        {
-            while (true)
-            {
-                _gridVisualiser.GetGridObject().SetValueOfCell(agent.transform.position, 0);
-                yield return new WaitForSeconds(1);
-            }
-        }
+        
 
         public void runCoroutine(IEnumerator routine)
         {
@@ -97,11 +87,20 @@ namespace AI
             onDamaging = dmg;
         }
 
+        public void SetDroppingStaleness(bool state)
+        {
+            _droppingStaleness = state;
+        }
+
+        public bool GetDroppingStaleness()
+        {
+            return _droppingStaleness;
+        }
+
         private IEnumerator DealDamage()
         {
             while (onDamaging)
             {
-                Debug.Log("CALL MADE");
                 Controller.Instance.DamagePlayer();
                 yield return new WaitForSeconds(1);
             }

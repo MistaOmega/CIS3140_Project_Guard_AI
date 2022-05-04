@@ -59,10 +59,6 @@ namespace AI.GuardStates
             guard.StartOnDamage(); // the coroutine ends when OnDamaging is false, so starting it once from an update should be okay
         }
 
-        public override void OnCollisionEnter(GuardStateMan guard)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         ///     Instead of being within the FOV cone constantly, this checks if the player is still within the full viewing circle.

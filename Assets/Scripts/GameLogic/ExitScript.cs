@@ -7,10 +7,17 @@ namespace GameLogic
         private TesterScript _testerScript;
         public static ExitScript Instance { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
-            Instance = this;
+            Instance = (ExitScript)FindObjectOfType(typeof(ExitScript));
             _testerScript = TesterScript.Instance;
+        }
+
+        private void Update()
+        {
+            if (_testerScript == null) _testerScript = TesterScript.Instance;
+            if (Instance != null) return;
+            Instance = (ExitScript)FindObjectOfType(typeof(ExitScript));
         }
 
         private void OnTriggerEnter(Collider other)
@@ -20,6 +27,7 @@ namespace GameLogic
 
         public void End()
         {
+
             Debug.Log("========================================== \n" +
                       "                               RESULTS             \n" +
                       "========================================== \n" +
@@ -29,7 +37,10 @@ namespace GameLogic
                       $"  THIEF COLLECTED VALUABLE: {_testerScript.thiefHasCollectedValuable} \n" +
                       $"  REMAINING PLAYER HEALTH: {Controller.Instance.health} \n" +
                       $"  TIME TO CAPTURE AFTER DETECTION: {_testerScript.detectionToCaptureTimer} \n" +
-                      "   AVERAGE NODE STALENESS: 0"); // todo add later
+                      $"  AVERAGE NODE STALENESS: {_testerScript.ComputeCellAverages()}");
+            
+            UnityEditor.EditorApplication.isPlaying = false;
+            Application.Quit();
         }
     }
 }

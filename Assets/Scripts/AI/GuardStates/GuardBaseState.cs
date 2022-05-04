@@ -10,6 +10,6 @@ namespace AI.GuardStates
 
         public abstract void UpdateState(GuardStateMan guard);
 
-        public abstract void OnCollisionEnter(GuardStateMan guard);
+
     }
 }

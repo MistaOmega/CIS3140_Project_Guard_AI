@@ -1,4 +1,3 @@
-using AI;
 using UnityEngine;
 
 namespace worldspace
@@ -12,7 +11,6 @@ namespace worldspace
         {
             _gridObject = new GridObject(6, 3, 25f);
             Instance = this;
-            
         }
 
         public GridObject GetGridObject()

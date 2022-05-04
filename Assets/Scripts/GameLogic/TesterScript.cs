@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using UnityEngine;
 using worldspace;
 
@@ -23,7 +23,7 @@ namespace GameLogic
         public float escapeTimer;
         public float detectionToCaptureTimer;
 
-        public bool isCoroutineRunning = false;
+        public bool isCoroutineRunning;
         public bool isGamePlaying;
         private GridObject _gridObject;
 
@@ -32,32 +32,20 @@ namespace GameLogic
 
         private void Start()
         {
-            if (Instance == null)
-            {
-                Instance = GameObject.FindWithTag("Manager").GetComponent<TesterScript>();
-            }
+            if (Instance == null) Instance = GameObject.FindWithTag("Manager").GetComponent<TesterScript>();
             GridVisualiser gridVisualiser = GridVisualiser.Instance;
             _gridObject = gridVisualiser.GetGridObject();
-            
-            if (!isCoroutineRunning)
-            {
-                StartCoroutine(EnumeratorNodeStaleness(1f));
-            }
+
+            if (!isCoroutineRunning) StartCoroutine(EnumeratorNodeStaleness(1f));
         }
 
 
         // Update is called once per frame
         private void Update()
         {
-            if (Instance == null)
-            {
-                Instance = GameObject.FindWithTag("Manager").GetComponent<TesterScript>();
-            }
+            if (Instance == null) Instance = GameObject.FindWithTag("Manager").GetComponent<TesterScript>();
             escapeTimer += Time.deltaTime;
-            if (hasDetectedThief)
-            {
-                detectionToCaptureTimer += Time.deltaTime;
-            }
+            if (hasDetectedThief) detectionToCaptureTimer += Time.deltaTime;
         }
 
         private IEnumerator EnumeratorNodeStaleness(float delay)
@@ -68,6 +56,13 @@ namespace GameLogic
                 yield return new WaitForSeconds(delay);
                 UpdateNodeStaleness();
             }
+        }
+
+        public float ComputeCellAverages()
+        {
+            int[,] arr = _gridObject.GetGridArray();
+            float total = arr.Cast<int>().Aggregate<int, float>(0, (current, val) => current + val);
+            return total / (arr.GetLength(0) * arr.GetLength(1));
         }
 
         private void UpdateNodeStaleness()
@@ -86,6 +81,5 @@ namespace GameLogic
         {
             thiefHasCollectedValuable = true;
         }
-        
     }
 }

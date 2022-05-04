@@ -15,9 +15,5 @@ namespace AI.GuardStates
             throw new NotImplementedException();
         }
 
-        public override void OnCollisionEnter(GuardStateMan guard)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

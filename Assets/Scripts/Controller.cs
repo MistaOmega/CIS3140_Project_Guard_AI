@@ -6,7 +6,7 @@ public class Controller : MonoBehaviour
     public float health = 10;
     private Camera _camera;
 
-    [Range(1, 15)] private float _moveSpeed = 6;
+    [Range(1, 15)] private float _moveSpeed = 8;
     private Rigidbody _rb;
 
     private Vector3 _velocity;
@@ -17,12 +17,13 @@ public class Controller : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _camera = Camera.main;
-        Instance = this;
+        Instance = (Controller)FindObjectOfType(typeof(Controller));
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if (Instance == null) Instance = (Controller)FindObjectOfType(typeof(Controller));
         Vector3 mousePos = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
             _camera.transform.position.y));
         transform.LookAt(mousePos + Vector3.up * transform.position.y);
@@ -38,7 +39,6 @@ public class Controller : MonoBehaviour
 
     public void DamagePlayer()
     {
-        Debug.Log("OW!");
         health -= 1;
 
         if (health != 0) return;

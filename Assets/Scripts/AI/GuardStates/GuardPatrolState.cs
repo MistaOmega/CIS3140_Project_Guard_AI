@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using worldspace;
 
 namespace AI.GuardStates
 {
@@ -9,7 +11,7 @@ namespace AI.GuardStates
     /// </summary>
     public class GuardPatrolState : GuardBaseState
     {
-        private readonly float _baseWaitTime = 3.0f;
+        private const float BaseWaitTime = 3.0f;
         private float _currentWaitTime;
 
         private float
@@ -19,6 +21,7 @@ namespace AI.GuardStates
             _maxZ; // boundary variables to be used to ensure the guard doesn't travel outside the play area
 
         private Vector3 _moveToPosition;
+        private GridObject go; // GridObject instance
 
 
         public override void EnterState(GuardStateMan guard)
@@ -28,12 +31,17 @@ namespace AI.GuardStates
             //Debug.Log($"MAX X = {_maxX}");
             if (_maxX == 0 || _maxZ == 0) // get patrol area to allow for navigation to fit inside area
                 GetBoundariesOfPatrolArea();
+            guard.SetGridVisualiser(); // We need a grid visualiser to be set to use it's GridObject
+            go = guard.GetGridVisualiser().GetGridObject(); // get the instance of the GridObject
 
             _moveToPosition = GetRandomRoamingPosition(guard.transform.position, 15, -1);
             guard.agent.SetDestination(_moveToPosition);
             guard.SetAgentSpeed(guard.initialAgentSpeed);
 
-            _currentWaitTime = _baseWaitTime;
+            _currentWaitTime = BaseWaitTime;
+            guard.SetDroppingStaleness(true);
+            guard.runCoroutine(LowerStaleness(1f,
+                guard)); // create a coroutine handling the lowering of a region's staleness value.
         }
 
         /// <summary>
@@ -44,6 +52,13 @@ namespace AI.GuardStates
         /// <param name="guard">Guard State Manager instance</param>
         public override void UpdateState(GuardStateMan guard)
         {
+            if (go == null)
+            {
+                guard.SetGridVisualiser();
+                go = guard.GetGridVisualiser().GetGridObject();
+            }
+
+            go = guard.GetGridVisualiser().GetGridObject();
             if (!(Vector3.Distance(guard.transform.position, _moveToPosition) < 5f)) return;
             guard.agent.isStopped = true;
             if (_currentWaitTime <= 0.5)
@@ -59,9 +74,21 @@ namespace AI.GuardStates
             }
         }
 
-        public override void OnCollisionEnter(GuardStateMan guard)
+        
+        /// <summary>
+        ///     Coroutine enumerator for handling the lowering of a staleness value
+        /// </summary>
+        /// <param name="waitTime"></param>
+        /// <param name="guard"></param>
+        /// <returns></returns>
+        public IEnumerator LowerStaleness(float waitTime, GuardStateMan guard)
         {
-            guard.ChangeState(guard._guardAttackState);
+            while (guard.GetDroppingStaleness()) 
+            {
+                yield return new WaitForSeconds(waitTime); // wait for the allocated time
+                go.ModifyValueAtCell(guard.transform.position,
+                    -6); // we add one every tick, so let's take that + 5 away.
+            }
         }
 
         /// <summary>
