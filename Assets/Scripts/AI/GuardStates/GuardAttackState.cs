@@ -23,32 +23,35 @@ namespace AI.GuardStates
             TesterScript.Instance.DetectThief();
         }
 
-
+        /// <summary>
+        /// Update function called once per frame by guardstateman
+        /// </summary>
+        /// <param name="guard">Guard State Manager script reference</param>
         public override void UpdateState(GuardStateMan guard)
         {
-            Vector3 lastKnownPosition = Controller.Instance.transform.position;
+            Vector3 lastKnownPosition = Controller.Instance.transform.position; // last known position of player
             // Debug.Log("Attacking Target");
-            if (!IsTargetStillWithinRange(guard))
+            if (!IsTargetStillWithinRange(guard)) // check if player is still within range
             {
                 guard.SetOnDamaging(
-                    false); // called here as it may never reach FOV check if player gets out of range fast enough 
+                    false); // called here as it may never reach FOV check if player gets out of range fast enough  
                 if (!(Vector3.Distance(guard.agent.transform.position, lastKnownPosition) < 5)) return;
-                guard.agent.ResetPath();
+                guard.agent.ResetPath(); // reset path if not in range and at previous location of player
                 guard.agent.isStopped = true;
                 return;
             }
 
-            if (guard.agent.isStopped) guard.agent.isStopped = false;
-            Transform targetTransform = Controller.Instance.transform;
+            if (guard.agent.isStopped) guard.agent.isStopped = false; // allow guard to move if stopped
+            Transform targetTransform = Controller.Instance.transform; // get player position
 
             Vector3 localPosition = targetTransform.localPosition;
             Vector3 dir = localPosition - guard.agent.transform.position;
-            guard.agent.SetDestination(localPosition);
+            guard.agent.SetDestination(localPosition); // navigate to player
 
-            Quaternion rotation = Quaternion.LookRotation(dir);
+            Quaternion rotation = Quaternion.LookRotation(dir); // look towards player
             guard.agent.transform.rotation =
                 Quaternion.Lerp(guard.agent.transform.rotation, rotation, 5 * Time.deltaTime);
-            if (!IsTargetInFOVField(guard))
+            if (!IsTargetInFOVField(guard)) // damage player if within the FOV field
             {
                 guard.SetOnDamaging(false);
                 return;
@@ -71,10 +74,16 @@ namespace AI.GuardStates
             return Vector3.Distance(guard.agent.transform.position, Controller.Instance.GetPosition()) < _range;
         }
 
+        /// <summary>
+        /// Check if target is sat within FOV field using function from FOV class
+        /// Requires reference to FOV to work
+        /// </summary>
+        /// <param name="guard">Guard State Manager reference</param>
+        /// <returns></returns>
         private bool IsTargetInFOVField(GuardStateMan guard)
         {
             FOV fov = guard._FOV;
-            targetTransforms = fov.FindVisibleTargets();
+            targetTransforms = fov.FindVisibleTargets(); // FOV function to find targets in FOV field
 
             return targetTransforms.Any();
         }

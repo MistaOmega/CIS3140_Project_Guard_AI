@@ -72,11 +72,19 @@ namespace AI
         }
         
 
+        /// <summary>
+        /// Allows the creation of any coroutine called from other classes
+        /// Potentially dangerous, but provides no errors or issues
+        /// </summary>
+        /// <param name="routine">Coroutine reference</param>
         public void runCoroutine(IEnumerator routine)
         {
             StartCoroutine(routine);
         }
 
+        /// <summary>
+        /// Start damage coroutine
+        /// </summary>
         public void StartOnDamage()
         {
             StartCoroutine(DealDamage());
@@ -84,25 +92,30 @@ namespace AI
 
         public void SetOnDamaging(bool dmg)
         {
-            onDamaging = dmg;
+            onDamaging = dmg; // change on damage state
         }
 
         public void SetDroppingStaleness(bool state)
         {
-            _droppingStaleness = state;
+            _droppingStaleness = state; // change _droppingStaleness state
         }
 
         public bool GetDroppingStaleness()
         {
-            return _droppingStaleness;
+            return _droppingStaleness; // get ref to dropping staleness bool
         }
 
+        /// <summary>
+        /// Deal damage to the player, one health per second
+        /// This is a coroutine, therefore runs on a separate loop to the rest of the game code
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator DealDamage()
         {
             while (onDamaging)
             {
                 Controller.Instance.DamagePlayer();
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(1); // wait for a second
             }
         }
 

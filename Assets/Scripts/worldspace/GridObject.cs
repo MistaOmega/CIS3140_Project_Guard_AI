@@ -95,14 +95,15 @@ namespace worldspace
             GuardManagerHolder
                 gmh = GuardManagerHolder.Instance; // This is so we can check current guard cell allocations
             int m = 0, n = 0;
-            float
-                highestVal =
-                    Mathf.NegativeInfinity; // we need this to define the next movable area. If this wasn't a very low negative we'd have issues later with negative value weights.
+            
+            // we need this to define the next movable area. If this wasn't a very low negative we'd have issues later with negative value weights.
+            float highestVal = Mathf.NegativeInfinity; 
 
-            for (int x = 0; x < _gridArray.GetLength(0); x++)
+            for (int x = 0; x < _gridArray.GetLength(0); x++) // iterate through every grid cell
             for (int z = 0; z < _gridArray.GetLength(1); z++)
             {
-                bool isAlreadyGuarded = false;
+                bool isAlreadyGuarded = false; // set to not guarded
+                // Check if the region is guarded
                 foreach (GuardStateMan guard in gmh.guards)
                 {
                     int guardx, guardz;
@@ -110,21 +111,21 @@ namespace worldspace
                     if (z == guardz && x == guardx) isAlreadyGuarded = true;
                 }
 
-                if (isAlreadyGuarded) continue;
-                float value = _gridArray[x, z];
+                if (isAlreadyGuarded) continue; // ignore guarded regions
+                float value = _gridArray[x, z]; // Get the value of the cell
 
 
                 Vector3 pos = GetWorldPosition(x, z);
-                value -= Vector3.Distance(origin, pos) * distanceMag;
+                value -= Vector3.Distance(origin, pos) * distanceMag; // Scale back the value by a factor of the distance
 
-                if (!(value > highestVal)) continue;
-                highestVal = value;
+                if (!(value > highestVal)) continue; // Ignore cells lower in value than the highest
+                highestVal = value; // assign higher values
                 m = x;
                 n = z;
                 //textArray[x, z].text = _gridArray[x, z].ToString();
             }
 
-            return GetWorldPosition(m, n, origin.y);
+            return GetWorldPosition(m, n, origin.y); // Convert cell position to center region of cell and return vector
         }
 
         public Vector3 GetWorldPosition(int x, int z, float y = 1)

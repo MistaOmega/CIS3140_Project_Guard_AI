@@ -8,7 +8,13 @@ namespace worldspace
         UNLOCKED
     }
 
-
+/// <summary>
+/// This class is unused. But a cool idea
+/// Can be attached to a door to make it lockable and unlockable
+/// Would need scripts to allow the door to animate open and closed though
+///
+/// Obviously untested.
+/// </summary>
     public class Lockable : MonoBehaviour
     {
         [SerializeField] private float timer = 5.0f;

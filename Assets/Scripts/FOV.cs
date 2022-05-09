@@ -47,6 +47,7 @@ public class FOV : MonoBehaviour
             {
                 guardStateTimer = 0;
                 _GuardStateMan.SetDroppingStaleness(false);
+                _GuardStateMan.ResetGuardGridPosition();
                 _GuardStateMan.ChangeState(_GuardStateMan._guardAttackState);
             }
             else if (!visibleTargets.Any() &&

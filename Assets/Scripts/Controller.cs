@@ -25,7 +25,7 @@ public class Controller : MonoBehaviour
     {
         if (Instance == null) Instance = (Controller)FindObjectOfType(typeof(Controller));
         Vector3 mousePos = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
-            _camera.transform.position.y));
+            _camera.transform.position.y)); // Convert a the mouse's current space on screen into a world position
         transform.LookAt(mousePos + Vector3.up * transform.position.y);
 
         _velocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized *
